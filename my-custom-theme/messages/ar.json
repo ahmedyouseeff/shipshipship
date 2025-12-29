@@ -1,0 +1,75 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "example_message": "مرحبا بالعالم {username}",
+  "config_status_title": "🎨 نظام القوالب",
+  "config_status_mode": "الوضع:",
+  "config_status_mode_development": "التطوير",
+  "config_status_mode_production": "الإنتاج",
+  "config_status_api": "API:",
+  "config_status_api_same_origin": "نفس المصدر",
+  "config_status_auth": "المصادقة:",
+  "config_status_auth_go_backend": "خادم Go",
+  "config_status_dev_mode": "🚧 وضع التطوير",
+  "config_status_dev_description": "خادم تطوير الواجهة الأمامية → خادم Go",
+  "config_status_template_active": "🎯 نظام القوالب نشط",
+  "config_status_template_description": "يتم تقديمه بواسطة خادم Go",
+  "footer_shipped_with": "تم الشحن مع",
+  "header_back_to_changelog": "العودة إلى سجل التغييرات",
+  "header_changelog": "سجل التغييرات",
+  "newsletter_stay_updated": "ابق على اطلاع",
+  "newsletter_description_short": "احصل على إشعارات حول الميزات والتحديثات الجديدة.",
+  "newsletter_description_long": "اشترك في نشرتنا الإخبارية وكن أول من يعرف عن الميزات والتحديثات الجديدة.",
+  "newsletter_success": "تم الاشتراك في النشرة الإخبارية بنجاح!",
+  "newsletter_already_subscribed": "أنت مشترك بالفعل في نشرتنا الإخبارية!",
+  "newsletter_error_invalid_email": "يرجى إدخال عنوان بريد إلكتروني صالح",
+  "newsletter_error_network": "خطأ في الشبكة. يرجى المحاولة مرة أخرى.",
+  "newsletter_placeholder_short": "أدخل بريدك الإلكتروني",
+  "newsletter_placeholder_long": "أدخل عنوان بريدك الإلكتروني",
+  "newsletter_button_subscribe": "اشترك",
+  "newsletter_button_subscribing": "جاري الاشتراك...",
+  "reaction_like": "إعجاب",
+  "reaction_love": "ممتاز",
+  "reaction_hot": "مثير",
+  "reaction_excited": "متحمس",
+  "reaction_watching": "متابع",
+  "reaction_great_idea": "فكرة رائعة",
+  "reaction_thinking": "أفكر",
+  "reaction_disagree": "لا أوافق",
+  "reaction_add": "إضافة رد فعل",
+  "reaction_error": "فشل تحديث رد الفعل",
+  "theme_select": "اختر المظهر",
+  "theme_light": "فاتح",
+  "theme_dark": "داكن",
+  "layout_title": "سجل التغييرات",
+  "layout_description": "خارطة طريق المنتج وسجل التغييرات",
+  "page_title": "سجل التغييرات",
+  "page_description": "سجل تغييرات المنتج وتحديثات الميزات",
+  "page_loading": "جاري التحميل...",
+  "page_error_loading": "فشل تحميل الأحداث",
+  "page_estimated": "مقدر",
+  "page_feature_voting": "تصويت الميزات",
+  "page_vote": "صوت",
+  "page_remove_vote": "إزالة التصويت",
+  "page_vote_tooltip": "انقر للتصويت على هذه الميزة",
+  "page_remove_vote_tooltip": "انقر لإزالة تصويتك",
+  "page_share_ideas": "شارك أفكارك",
+  "page_feedback_success": "شكرًا لملاحظاتك! سنراجعها قريبًا.",
+  "page_feedback_title": "العنوان",
+  "page_feedback_title_placeholder": "ما هي فكرتك؟",
+  "page_feedback_description": "الوصف",
+  "page_feedback_description_placeholder": "أخبرنا المزيد عن فكرتك...",
+  "page_feedback_submitting": "جاري الإرسال...",
+  "page_feedback_submit": "إرسال الفكرة",
+  "page_no_updates": "لا توجد تحديثات بعد",
+  "page_no_updates_description": "لم ننشر أي تحديثات بعد. تحقق مرة أخرى قريبًا للحصول على أحدث الميزات والتحسينات!",
+  "page_feedback_error_time": "يرجى أخذ الوقت الكافي لملء النموذج بشكل صحيح.",
+  "page_feedback_error_rate_limit": "يرجى الانتظار {seconds} ثانية قبل الإرسال مرة أخرى.",
+  "page_feedback_error_rate_limit_extended": "الكثير من الإرسالات. يرجى الانتظار {minutes} دقيقة.",
+  "page_feedback_error_failed": "فشل إرسال الملاحظات. يرجى المحاولة مرة أخرى.",
+  "page_vote_error_failed": "فشل التصويت",
+  "event_estimated": "مقدر",
+  "event_link_copied": "تم نسخ الرابط إلى الحافظة!",
+  "event_feature_prefix": "الميزة:",
+  "language_select": "اختر اللغة"
+}
+
