@@ -180,30 +180,29 @@ export function generateId(): string {
 
 /**
  * Toggle theme between light and dark
+ * Note: Light mode is enforced, this function always sets light mode
  */
 export function toggleTheme(): void {
-  const isDark = document.documentElement.classList.contains("dark");
-  const newTheme = isDark ? "light" : "dark";
-
-  document.documentElement.classList.toggle("dark", newTheme === "dark");
+  // Always force light mode
+  document.documentElement.classList.remove("dark");
 
   if (typeof window !== "undefined") {
-    localStorage.setItem("theme", newTheme);
+    localStorage.setItem("theme", "light");
   }
 }
 
 /**
  * Get current theme
+ * Note: Always returns light mode as it's enforced
  */
 export function getCurrentTheme(): "light" | "dark" {
   if (typeof window === "undefined") return "light";
 
-  const stored = localStorage.getItem("theme");
-  if (stored === "dark" || stored === "light") return stored;
-
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
+  // Always return light and ensure localStorage is set to light
+  if (typeof window !== "undefined") {
+    localStorage.setItem("theme", "light");
+  }
+  return "light";
 }
 
 /**
@@ -221,10 +220,14 @@ export function generateSlug(title: string): string {
 
 /**
  * Initialize theme on page load
+ * Note: Always initializes to light mode
  */
 export function initializeTheme(): void {
   if (typeof window === "undefined") return;
 
-  const theme = getCurrentTheme();
-  document.documentElement.classList.toggle("dark", theme === "dark");
+  // Always set to light mode
+  document.documentElement.classList.remove("dark");
+  if (typeof window !== "undefined") {
+    localStorage.setItem("theme", "light");
+  }
 }

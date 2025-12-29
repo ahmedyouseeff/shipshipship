@@ -55,7 +55,8 @@
     );
 </script>
 
-<div class="relative theme-selector">
+<!-- Theme selector is hidden - light mode is enforced -->
+<div class="relative theme-selector" style="display: none;">
     <!-- Theme Toggle Button -->
     <Button
         variant="outline"

@@ -15,66 +15,48 @@ function createThemeStore() {
     init: () => {
       if (!browser) return;
 
-      // Get stored preference or default to light
-      const stored = localStorage.getItem("theme") as ThemePreference | null;
+      // Always force light mode - ignore any stored preference
+      const initialTheme: Theme = "light";
 
-      let initialTheme: Theme;
-      if (stored === "light" || stored === "dark") {
-        initialTheme = stored;
-      } else {
-        // No stored preference or was "system", default to light
-        initialTheme = "light";
-        localStorage.setItem("theme", "light");
-      }
+      // Always set localStorage to light if accessed
+      localStorage.setItem("theme", "light");
 
-      // Apply theme to document
-      document.documentElement.classList.toggle(
-        "dark",
-        initialTheme === "dark",
-      );
+      // Apply theme to document - ensure dark class is removed
+      document.documentElement.classList.remove("dark");
       set(initialTheme);
 
       // No longer listening for system theme changes since system option is removed
     },
     toggle: () => {
-      update((current) => {
-        const newTheme = current === "light" ? "dark" : "light";
-
-        if (browser) {
-          document.documentElement.classList.toggle(
-            "dark",
-            newTheme === "dark",
-          );
-          localStorage.setItem("theme", newTheme);
-        }
-
-        return newTheme;
-      });
+      // Do nothing - always keep light mode
+      // But still update the store to prevent UI inconsistencies
+      if (browser) {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+      set("light");
     },
     setPreference: (preference: ThemePreference) => {
       if (!browser) return;
 
-      // Set explicit theme
-      localStorage.setItem("theme", preference);
-      document.documentElement.classList.toggle("dark", preference === "dark");
-      set(preference);
+      // Always force light mode regardless of preference
+      localStorage.setItem("theme", "light");
+      document.documentElement.classList.remove("dark");
+      set("light");
     },
     getPreference: (): ThemePreference => {
       if (!browser) return "light";
-      const stored = localStorage.getItem("theme");
-      if (stored === "light" || stored === "dark") {
-        return stored;
-      }
-      // If no valid stored preference or was "system", default to light
+      // Always return light and ensure localStorage is set to light
       localStorage.setItem("theme", "light");
       return "light";
     },
     set: (theme: Theme) => {
+      // Always force light mode regardless of what's passed
       if (browser) {
-        document.documentElement.classList.toggle("dark", theme === "dark");
-        localStorage.setItem("theme", theme);
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
       }
-      set(theme);
+      set("light");
     },
   };
 }
