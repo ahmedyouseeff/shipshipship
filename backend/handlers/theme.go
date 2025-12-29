@@ -568,6 +568,18 @@ func InitializeDefaultTheme() error {
 			db.Save(settings)
 			fmt.Println("Database updated to reflect existing theme files")
 		}
+
+		// Load theme manifest and ensure mappings exist for all statuses
+		manifest, err := models.LoadThemeManifest("./data/themes/current")
+		if err == nil && manifest != nil && settings.CurrentThemeID != "" {
+			// Create mappings for any unmapped statuses
+			if err := models.CreateDefaultMappings(db, settings.CurrentThemeID, manifest); err != nil {
+				fmt.Printf("Warning: Failed to create default mappings for existing theme: %v\n", err)
+			} else {
+				fmt.Println("Ensured status mappings exist for existing theme")
+			}
+		}
+
 		return nil
 	}
 

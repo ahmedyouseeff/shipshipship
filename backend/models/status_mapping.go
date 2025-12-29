@@ -169,25 +169,49 @@ func GetOrCreateMapping(db *gorm.DB, statusDefID uint, themeID string, defaultCa
 
 // SuggestCategoryForStatus suggests a category based on status name
 func SuggestCategoryForStatus(statusName string, categories []ThemeCategory) string {
-	lower := strings.ToLower(statusName)
+	lower := strings.ToLower(strings.TrimSpace(statusName))
 
-	// Define keyword mappings
-	keywordMappings := map[string][]string{
-		"upcoming": {"doing", "progress", "wip", "dev", "development", "building",
-			"cours", "actuel", "en cours", "current", "in progress"},
-		"released": {"done", "released", "shipped", "live", "deployed", "completed",
-			"terminé", "publié", "fini", "sortie", "launch"},
-		"proposed": {"vote", "voting", "proposed", "idea", "suggestion", "feedback",
-			"proposition", "idée", "request"},
-		"feedback": {"feedback", "suggestion", "suggestions", "user feedback", "feature request"},
+	// First, check for exact matches (most specific first)
+	// This ensures "Feedback" maps to "feedback" category, not "proposed"
+	exactMatches := map[string]string{
+		"feedback":    "feedback",
+		"proposed":    "proposed",
+		"released":    "released",
+		"upcoming":    "upcoming",
+		"in progress": "upcoming",
+		"backlog":     "proposed", // Backlog items are typically proposed features
+		"archived":    "released", // Archived items are typically released
 	}
 
-	// Try to match keywords to category IDs
-	for categoryID, keywords := range keywordMappings {
+	if exactMatch, exists := exactMatches[lower]; exists {
+		// Verify the category exists in the theme
+		for _, cat := range categories {
+			if cat.ID == exactMatch {
+				return exactMatch
+			}
+		}
+	}
+
+	// Define keyword mappings (ordered by priority - more specific first)
+	// Note: "feedback" category should be checked before "proposed" since "proposed" contains "feedback" as a keyword
+	keywordMappings := []struct {
+		categoryID string
+		keywords   []string
+	}{
+		{"feedback", []string{"feedback", "suggestion", "suggestions", "user feedback", "feature request"}},
+		{"upcoming", []string{"doing", "progress", "wip", "dev", "development", "building",
+			"cours", "actuel", "en cours", "current", "in progress"}},
+		{"released", []string{"done", "released", "shipped", "live", "deployed", "completed",
+			"terminé", "publié", "fini", "sortie", "launch"}},
+		{"proposed", []string{"vote", "voting", "proposed", "idea", "proposition", "idée", "request"}},
+	}
+
+	// Try to match keywords to category IDs (in priority order)
+	for _, mapping := range keywordMappings {
 		// Check if this category exists in the theme
 		categoryExists := false
 		for _, cat := range categories {
-			if cat.ID == categoryID {
+			if cat.ID == mapping.categoryID {
 				categoryExists = true
 				break
 			}
@@ -198,9 +222,9 @@ func SuggestCategoryForStatus(statusName string, categories []ThemeCategory) str
 		}
 
 		// Check if status name contains any keyword
-		for _, keyword := range keywords {
+		for _, keyword := range mapping.keywords {
 			if strings.Contains(lower, keyword) {
-				return categoryID
+				return mapping.categoryID
 			}
 		}
 	}

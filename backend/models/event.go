@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -163,9 +164,115 @@ func GetOrCreateStatusDefinition(db *gorm.DB, displayName string) (*EventStatusD
 	return &def, nil
 }
 
+// SeedDefaultStatuses creates default status definitions if none exist
+func SeedDefaultStatuses(db *gorm.DB) error {
+	// Check if any statuses exist
+	var count int64
+	if err := db.Model(&EventStatusDefinition{}).Count(&count).Error; err != nil {
+		return fmt.Errorf("failed to check existing statuses: %w", err)
+	}
+
+	// If statuses already exist, don't create defaults
+	if count > 0 {
+		fmt.Printf("Statuses already exist (%d), skipping default status creation\n", count)
+		return nil
+	}
+
+	fmt.Printf("No statuses found, creating default statuses\n")
+
+	// Default statuses in order
+	defaultStatuses := []struct {
+		Name  string
+		Order int
+	}{
+		{"Backlog", 0},
+		{"Proposed", 1},
+		{"Feedback", 2},
+		{"In Progress", 3},
+		{"Released", 4},
+		{"Archived", 5},
+	}
+
+	createdStatuses := []EventStatusDefinition{}
+
+	for _, ds := range defaultStatuses {
+		// Check if status already exists
+		var existing EventStatusDefinition
+		err := db.Where("LOWER(display_name) = ?", strings.ToLower(ds.Name)).First(&existing).Error
+		if err == nil {
+			fmt.Printf("Status %s already exists, skipping\n", ds.Name)
+			continue
+		}
+		if err != gorm.ErrRecordNotFound {
+			return fmt.Errorf("failed to check existing status: %w", err)
+		}
+
+		// Generate unique slug
+		slug := utils.GenerateUniqueSlug(db, ds.Name, "event_status_definitions")
+
+		// Create the status
+		status := EventStatusDefinition{
+			DisplayName: ds.Name,
+			Slug:        slug,
+			Order:       ds.Order,
+			IsReserved:  false,
+		}
+
+		if err := db.Create(&status).Error; err != nil {
+			return fmt.Errorf("failed to create status %s: %w", ds.Name, err)
+		}
+
+		fmt.Printf("Created default status: %s (order: %d)\n", ds.Name, ds.Order)
+		createdStatuses = append(createdStatuses, status)
+	}
+
+	// If we created statuses and a theme exists, create mappings
+	if len(createdStatuses) > 0 {
+		// Check if a theme is applied
+		var settings ProjectSettings
+		if err := db.First(&settings).Error; err == nil && settings.CurrentThemeID != "" {
+			// Load theme manifest
+			manifest, err := LoadThemeManifest("./data/themes/current")
+			if err == nil && manifest != nil {
+				// Create mappings for the newly created statuses
+				for _, status := range createdStatuses {
+					suggestedCategory := SuggestCategoryForStatus(status.DisplayName, manifest.Categories)
+
+					// Check if mapping already exists
+					var existingMapping StatusCategoryMapping
+					err := db.Where("status_definition_id = ? AND theme_id = ?", status.ID, settings.CurrentThemeID).First(&existingMapping).Error
+					if err == nil {
+						continue // Mapping already exists
+					}
+
+					// Create mapping
+					mapping := StatusCategoryMapping{
+						StatusDefinitionID: status.ID,
+						ThemeID:            settings.CurrentThemeID,
+						CategoryID:         suggestedCategory,
+					}
+
+					if err := db.Create(&mapping).Error; err != nil {
+						fmt.Printf("Warning: Failed to create mapping for status %s: %v\n", status.DisplayName, err)
+					} else {
+						fmt.Printf("Created mapping: %s -> %s\n", status.DisplayName, suggestedCategory)
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 // SeedStatusDefinitions initializes any legacy statuses found in existing events
 func SeedStatusDefinitions(db *gorm.DB) error {
-	// Detect distinct existing event statuses and seed definitions for them
+	// First, seed default statuses if database is empty
+	if err := SeedDefaultStatuses(db); err != nil {
+		fmt.Printf("Warning: Failed to seed default statuses: %v\n", err)
+	}
+
+	// Then, detect distinct existing event statuses and seed definitions for them
 	var rawStatuses []string
 	if err := db.Model(&Event{}).Distinct().Pluck("status", &rawStatuses).Error; err == nil {
 		for _, rs := range rawStatuses {
